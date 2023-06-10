@@ -1,14 +1,28 @@
 import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { postCreateUser } from '../services/UserService';
+import { toast } from 'react-toastify';
 
 
 const ModalAddNew = (props) => {
-    const { show, handleClose } = props;
+    const { show, handleClose, handleUpdateTable } = props;
     const [name, setName] = useState('');
     const [job, setJob] = useState('');
 
-    const handleSaveUser = () => {
-        console.log('>>> check state: ', "name: ", name, "job: ", job);
+    const handleSaveUser = async () => {
+        let res = await postCreateUser(name, job);
+        console.log('>>> check res: ', res);
+        if (res && res.id) {
+            //success
+            handleClose();
+            setName('');
+            setJob('');
+            toast.success('a User is created successfully!')
+            handleUpdateTable({ first_name: name, id: res.id });
+        } else {
+            //err
+            toast.success('an error occurred')
+        }
     }
 
     return (
@@ -22,7 +36,7 @@ const ModalAddNew = (props) => {
                         <form>
                             <div class="mb-3">
                                 <label className="form-label">Name</label>
-                                <input type="email"
+                                <input type="text"
                                     class="form-control"
                                     value={name}
                                     onChange={(event) => setName(event.target.value)}
@@ -30,7 +44,7 @@ const ModalAddNew = (props) => {
                             </div>
                             <div class="mb-3">
                                 <label className="form-label">Job</label>
-                                <input type="password" class="form-control"
+                                <input type="text" class="form-control"
                                     value={job}
                                     onChange={(event) => setJob(event.target.value)}
                                 />
