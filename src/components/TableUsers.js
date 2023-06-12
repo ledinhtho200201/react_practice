@@ -3,7 +3,8 @@ import Table from 'react-bootstrap/Table';
 import { fetchAllUser } from '../services/UserService';
 import ReactPaginate from 'react-paginate';
 import ModalAddNew from './ModalAddNew';
-
+import ModalEditUser from './ModalEditUser';
+import _ from 'lodash';
 
 
 const TableUsers = (props) => {
@@ -12,9 +13,12 @@ const TableUsers = (props) => {
     const [totalPages, setTotalPages] = useState(0);
 
     const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
+    const [isShowModalEdit, setIsShowModalEdit] = useState(false);
+    const [dataUserEdit, setDataUserEdit] = useState({})
 
     const handleClose = () => {
-        setIsShowModalAddNew(false)
+        setIsShowModalAddNew(false);
+        setIsShowModalEdit(false);
     }
 
     const handleUpdateTable = (user) => {
@@ -36,9 +40,23 @@ const TableUsers = (props) => {
         }
     }
 
-
     const handlePageClick = (event) => {
         getUsers(+event.selected + 1);
+    }
+
+    const handleEditUser = (user) => {
+        setDataUserEdit(user);
+        setIsShowModalEdit(true);
+    }
+
+    const handleEditUserFromModal = (user) => {
+        let cloneListusers = _.cloneDeep(listUsers);
+        let index = listUsers.findIndex(item => item.id === user.id);
+        console.log('>> ck user: ', user)
+        cloneListusers[index].first_name = user.first_name;
+        setListUsers(cloneListusers);
+        console.log(listUsers, cloneListusers)
+        console.log('>>>check index: ', index);
     }
 
     return (
@@ -59,6 +77,7 @@ const TableUsers = (props) => {
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>Avatar</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,6 +90,12 @@ const TableUsers = (props) => {
                                     <td>{item.first_name}</td>
                                     <td>{item.last_name}</td>
                                     <td><img src={item.avatar} /></td>
+                                    <td>
+                                        <button className='btn btn-warning mx-3'
+                                            onClick={() => handleEditUser(item)}
+                                        >Edit</button>
+                                        <button className='btn btn-danger'>Delete</button>
+                                    </td>
                                 </tr>
                             )
                         })}
@@ -101,6 +126,15 @@ const TableUsers = (props) => {
                 handleClose={handleClose}
                 handleUpdateTable={handleUpdateTable}
             />
+
+            <ModalEditUser
+                show={isShowModalEdit}
+                handleClose={handleClose}
+                dataUserEdit={dataUserEdit}
+                handleUpdateTable={handleUpdateTable}
+                handleEditUserFromModal={handleEditUserFromModal}
+            />
+
 
         </>)
 }
