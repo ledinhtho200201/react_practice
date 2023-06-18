@@ -5,7 +5,8 @@ import ReactPaginate from 'react-paginate';
 import ModalAddNew from './ModalAddNew';
 import ModalEditUser from './ModalEditUser';
 import _ from 'lodash';
-
+import ModalConfirm from './ModalConfirm';
+import './TableUser.scss';
 
 const TableUsers = (props) => {
     const [listUsers, setListUsers] = useState([]);
@@ -15,10 +16,16 @@ const TableUsers = (props) => {
     const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
     const [isShowModalEdit, setIsShowModalEdit] = useState(false);
     const [dataUserEdit, setDataUserEdit] = useState({})
+    const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+    const [dataUserDelete, setDataUserDelete] = useState({})
+
+    const [sortBy, setSortBy] = useState('asc');
+    const [sortField, setSortField] = useState('id');
 
     const handleClose = () => {
         setIsShowModalAddNew(false);
         setIsShowModalEdit(false);
+        setIsShowModalDelete(false);
     }
 
     const handleUpdateTable = (user) => {
@@ -59,6 +66,25 @@ const TableUsers = (props) => {
         console.log('>>>check index: ', index);
     }
 
+    const handleDeleteUser = (user) => {
+        setIsShowModalDelete(true);
+        setDataUserDelete(user);
+    }
+
+    const handleDeleteUserFromModal = (user) => {
+        let cloneListusers = _.cloneDeep(listUsers);
+        cloneListusers = cloneListusers.filter(item => item.id !== user.id);
+        setListUsers(cloneListusers);
+    }
+
+    const handleSort = (sortBy, sortField) => {
+        setSortBy(sortBy);
+        setSortField(sortField);
+        let cloneListusers = _.cloneDeep(listUsers);
+        cloneListusers = _.orderBy(cloneListusers, [sortField], [sortBy]);
+        setListUsers(cloneListusers);
+    }
+
     return (
         <>
             <div className='my-3 add-new d-flex justify-content-between'>
@@ -72,9 +98,33 @@ const TableUsers = (props) => {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>email</th>
-                        <th>First Name</th>
+                        <th>
+                            <div className='sort-header'>
+                                <span>ID</span>
+                                <span>
+                                    <i className="fa-solid fa-arrow-up-a-z"
+                                        onClick={() => handleSort('asc', 'id')}
+                                    ></i>
+                                    <i className="fa-solid fa-arrow-down-z-a"
+                                        onClick={() => handleSort('desc', 'id')}
+                                    ></i>
+                                </span>
+                            </div>
+                        </th>
+                        <th>Email</th>
+                        <th>
+                            <div className='sort-header'>
+                                <span>First Name</span>
+                                <span>
+                                    <i className="fa-solid fa-arrow-up-a-z"
+                                        onClick={() => handleSort('asc', 'first_name')}
+                                    ></i>
+                                    <i className="fa-solid fa-arrow-down-z-a"
+                                        onClick={() => handleSort('desc', 'first_name')}
+                                    ></i>
+                                </span>
+                            </div>
+                        </th>
                         <th>Last Name</th>
                         <th>Avatar</th>
                         <th>Actions</th>
@@ -94,7 +144,9 @@ const TableUsers = (props) => {
                                         <button className='btn btn-warning mx-3'
                                             onClick={() => handleEditUser(item)}
                                         >Edit</button>
-                                        <button className='btn btn-danger'>Delete</button>
+                                        <button className='btn btn-danger'
+                                            onClick={() => handleDeleteUser(item)}
+                                        >Delete</button>
                                     </td>
                                 </tr>
                             )
@@ -133,6 +185,13 @@ const TableUsers = (props) => {
                 dataUserEdit={dataUserEdit}
                 handleUpdateTable={handleUpdateTable}
                 handleEditUserFromModal={handleEditUserFromModal}
+            />
+
+            <ModalConfirm
+                show={isShowModalDelete}
+                handleClose={handleClose}
+                dataUserDelete={dataUserDelete}
+                handleDeleteUserFromModal={handleDeleteUserFromModal}
             />
 
 
