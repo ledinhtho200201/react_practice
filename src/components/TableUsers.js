@@ -7,6 +7,7 @@ import ModalEditUser from './ModalEditUser';
 import _ from 'lodash';
 import ModalConfirm from './ModalConfirm';
 import './TableUser.scss';
+// import {debounce} from "lodash";
 
 const TableUsers = (props) => {
     const [listUsers, setListUsers] = useState([]);
@@ -85,6 +86,15 @@ const TableUsers = (props) => {
         setListUsers(cloneListusers);
     }
 
+    const handleSearch = _.debounce((event) => {
+        let term = event.target.value;
+        console.log('term', term);
+        let cloneListusers = _.cloneDeep(listUsers);
+        cloneListusers = cloneListusers.filter(item => item.email.includes(term));
+        console.log(cloneListusers)
+        setListUsers(cloneListusers);
+    }, 500)
+
     return (
         <>
             <div className='my-3 add-new d-flex justify-content-between'>
@@ -94,6 +104,12 @@ const TableUsers = (props) => {
                 >
                     Add new user
                 </button>
+            </div>
+            <div className='col-4 my-3'>
+                <input type='text'
+                    placeholder='Search users by email ...'
+                    onChange={(event) => handleSearch(event)}
+                />
             </div>
             <Table striped bordered hover>
                 <thead>
