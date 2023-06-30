@@ -7,6 +7,7 @@ import ModalEditUser from './ModalEditUser';
 import _ from 'lodash';
 import ModalConfirm from './ModalConfirm';
 import './TableUser.scss';
+import { CSVLink } from "react-csv";
 // import {debounce} from "lodash";
 
 const TableUsers = (props) => {
@@ -22,6 +23,8 @@ const TableUsers = (props) => {
 
     const [sortBy, setSortBy] = useState('asc');
     const [sortField, setSortField] = useState('id');
+
+    const [dataExport, setDataExport] = useState([]);
 
     const handleClose = () => {
         setIsShowModalAddNew(false);
@@ -95,15 +98,47 @@ const TableUsers = (props) => {
         setListUsers(cloneListusers);
     }, 500)
 
+    const getUsersExport = (event, done) => {
+        let result = [];
+        if (listUsers && listUsers.length > 0) {
+            result.push(["Id", "Email", "First name", "Last name"]);
+            listUsers.map((item, index) => {
+                let arr = [];
+                arr[0] = item.id;
+                arr[1] = item.email;
+                arr[2] = item.first_name;
+                arr[3] = item.last_name;
+                result.push(arr);
+            })
+            setDataExport(result);
+            done(true);
+        }
+    }
+
     return (
         <>
             <div className='my-3 add-new d-flex justify-content-between'>
                 <span><h3>List Users:</h3></span>
-                <button className='btn btn-success'
-                    onClick={() => setIsShowModalAddNew(true)}
-                >
-                    Add new user
-                </button>
+                <div className='group-btns'>
+                    <label className='btn btn-warning' for='btnDownload'>
+                        <i class="fa-solid fa-file-import"></i> Import</label>
+                    <input id='btnDownload' type='file' hidden />
+                    <CSVLink
+                        data={dataExport}
+                        asyncOnClick={true}
+                        onClick={getUsersExport}
+                        filename={"users.csv"}
+                        className="btn btn-primary"
+                        target="_blank"
+                    >
+                        <i class="fa-solid fa-file-export"></i> Export
+                    </CSVLink>
+                    <button className='btn btn-success'
+                        onClick={() => setIsShowModalAddNew(true)}
+                    >
+                        <i className="fa-solid fa-circle-plus"></i> Add new
+                    </button>
+                </div>
             </div>
             <div className='col-4 my-3'>
                 <input type='text'
