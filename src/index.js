@@ -10,13 +10,16 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 //   RouterProvider,
 // } from "react-router-dom";
 import { BrowserRouter as Router } from "react-router-dom";
+import { UserProvider } from './context/UserContext';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
+    <UserProvider>
+      <Router>
+        <App />
+      </Router>
+    </UserProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )
